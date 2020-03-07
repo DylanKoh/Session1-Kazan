@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Name="ThisPage"
+             x:Class="Session1_Kazan.MainPage">
+
+    <StackLayout>
+        <Grid Padding="10">
+            <Picker Title="Department"
+                    x:Name="pDepartments" Grid.Column="0"
+                    HeightRequest="100"
+                    SelectedIndexChanged="pDepartments_SelectedIndexChanged"></Picker>
+            <Picker Title="Asset Group"
+                    x:Name="pAssetGroups" Grid.Column="1"
+                    SelectedIndexChanged="pAssetGroups_SelectedIndexChanged"></Picker>
+            <Label Text="Warranty Date Range:" Grid.Row="1"></Label>
+            <Label Text="Start Date:" Grid.Column="0"
+                   Grid.Row="2"
+                   ></Label>
+            <Label Text="End Date:" Grid.Column="1"
+                   Grid.Row="2"></Label>
+            <DatePicker x:Name="dpStartDate" Grid.Column="0"
+                        Grid.Row="3"></DatePicker>
+            <DatePicker x:Name="dpEndDate" Grid.Column="1"
+                        Grid.Row="3" ></DatePicker>
+        </Grid>
+        <SearchBar Placeholder="Search" x:Name="entrySearch"
+                   TextChanged="entrySearch_TextChanged"></SearchBar>
+        <ListView x:Name="lvAsset" Margin="20"
+                  HasUnevenRows="True"
+                  VerticalOptions="FillAndExpand">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+
+                        <StackLayout Orientation="Horizontal"
+                                         VerticalOptions="FillAndExpand"
+                                         HorizontalOptions="FillAndExpand">
+                            <StackLayout Orientation="Vertical"
+                                     VerticalOptions="FillAndExpand"
+                                         HorizontalOptions="FillAndExpand">
+                                <Label Text="{Binding AssetName}"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand"></Label>
+                                <Label Text="{Binding DepartmentName}"
+                                       HorizontalOptions="FillAndExpand"></Label>
+                                <Label Text="{Binding AssetSN}"
+                                       HorizontalOptions="FillAndExpand"></Label>
+                            </StackLayout>
+                            <ImageButton
+                                    x:Name="btnEdit"
+                                    Clicked="btnEdit_Clicked"
+                                    Source="editbtn.png"
+                                HeightRequest="40"
+                                WidthRequest="40"
+                                    HorizontalOptions="Fill" 
+                                Aspect="AspectFit"
+                                BackgroundColor="Transparent"/>
+                            <ImageButton 
+                                    x:Name="btnMove"
+                                    Clicked="btnMove_Clicked"
+                                    HorizontalOptions="Fill"
+                                HeightRequest="40"
+                                WidthRequest="40"
+                                    Source="moveBtn.png"
+                                Aspect="AspectFit"
+                                BackgroundColor="Transparent"></ImageButton>
+                            <ImageButton
+                                    x:Name="btnHistory"
+                                    Clicked="btnHistory_Clicked"
+                                    HorizontalOptions="Fill"
+                                HeightRequest="40"
+                                WidthRequest="40"
+                                    Source="historyBtn.png"
+                                Aspect="AspectFit"
+                                BackgroundColor="Transparent"></ImageButton>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ImageButton HorizontalOptions="EndAndExpand"
+                VerticalOptions="EndAndExpand"
+                x:Name="btnAdd"
+                Clicked="btnAdd_Clicked"
+                WidthRequest="60"
+                HeightRequest="60"
+                     Source="addbtn.png"
+                     Aspect="AspectFit"
+                     BackgroundColor="Transparent"/>
+                
+            
+
+
+
+    </StackLayout>
+
+</ContentPage>
