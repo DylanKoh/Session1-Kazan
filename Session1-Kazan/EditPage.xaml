@@ -11,7 +11,7 @@
                    x:Name="entryAssetName"></Entry>
             <Grid>
                 <Picker x:Name="pDepartment" Title="Department" SelectedIndexChanged="pDepartment_SelectedIndexChanged"/>
-                <Picker x:Name="pLocation" Title="Location" SelectedIndexChanged="pLocation_SelectedIndexChanged" Grid.Column="1"/>
+                <Picker x:Name="pLocation" Title="Location" Grid.Column="1"/>
                 <Picker x:Name="pAssetGroup" Title="Asset Group" SelectedIndexChanged="pAssetGroup_SelectedIndexChanged" Grid.Row="1"/>
                 <Picker x:Name="pAccountableParty" Title="Accountable Party" Grid.Column="1" Grid.Row="1"/>
             </Grid>

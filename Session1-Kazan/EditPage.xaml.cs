@@ -20,6 +20,7 @@ namespace Session1_Kazan
         List<Location> _locations;
         List<AssetGroup> _assetGroups;
         List<Employee> _employees;
+        List<Asset> _assets;
         string _assetSN;
         public EditPage()
         {
@@ -34,6 +35,30 @@ namespace Session1_Kazan
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            await LoadPickers();
+            if (_assetSN != string.Empty)
+            {
+                getAssetDetails();
+            }
+            else
+            {
+                var getAssets = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Assets", "POST", Encoding.UTF8.GetBytes(""));
+                _assets = JsonConvert.DeserializeObject<List<Asset>>(Encoding.Default.GetString(getAssets));
+            }
+            
+        }
+
+        private async Task LoadPickers()
+        {
+            #region Getting all the employees and adding them into the picker for Accountable Party
+            var employees = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Employees", "POST", Encoding.UTF8.GetBytes(""));
+            _employees = JsonConvert.DeserializeObject<List<Employee>>(Encoding.Default.GetString(employees));
+            foreach (var item in _employees)
+            {
+                pAccountableParty.Items.Add(item.FirstName + " " + item.LastName);
+            }
+            #endregion
+
             #region Getting all the departments and adding them into the picker
             var getDepartments = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Departments", "POST", Encoding.UTF8.GetBytes(""));
             _departments = JsonConvert.DeserializeObject<List<Department>>(Encoding.Default.GetString(getDepartments));
@@ -61,20 +86,6 @@ namespace Session1_Kazan
             }
             #endregion
 
-            #region Getting all the employees and adding them into the picker for Accountable Party
-            var employees = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Employees", "POST", Encoding.UTF8.GetBytes(""));
-            _employees = JsonConvert.DeserializeObject<List<Employee>>(Encoding.Default.GetString(employees));
-            foreach (var item in _employees)
-            {
-                pAccountableParty.Items.Add(item.FirstName + " " + item.LastName);
-            }
-            #endregion
-
-            if (_assetSN != string.Empty)
-            {
-                getAssetDetails();
-            }
-            
         }
 
         private async void getAssetDetails()
@@ -117,13 +128,34 @@ namespace Session1_Kazan
             }
             else
             {
+                var getDepartmentID = (from x in _departments
+                                       where x.Name == pDepartment.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
 
+                var getAssetGroupID = (from x in _assetGroups
+                                       where x.Name == pAssetGroup.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
+
+                var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
+                var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
+
+                var lastAsset = (from x in _assets
+                                 where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
+                                 orderby x.AssetSN descending
+                                 select x.AssetSN).FirstOrDefault();
+                if (lastAsset != null)
+                {
+                    var newNumber = (Int64.Parse(lastAsset.Split('/')[2]) + 1).ToString().PadLeft(4, '0');
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
+                }
+                else
+                {
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
+                }
+                
             }
         }
 
-        private void pLocation_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
 
         private void pAssetGroup_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -133,6 +165,30 @@ namespace Session1_Kazan
             }
             else
             {
+                var getDepartmentID = (from x in _departments
+                                       where x.Name == pDepartment.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
+
+                var getAssetGroupID = (from x in _assetGroups
+                                       where x.Name == pAssetGroup.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
+
+                var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
+                var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
+
+                var lastAsset = (from x in _assets
+                                 where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
+                                 orderby x.AssetSN descending
+                                 select x.AssetSN).FirstOrDefault();
+                if (lastAsset != null)
+                {
+                    var newNumber = (Int64.Parse(lastAsset.Split('/')[2]) + 1).ToString().PadLeft(4, '0');
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
+                }
+                else
+                {
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
+                }
 
             }
         }
