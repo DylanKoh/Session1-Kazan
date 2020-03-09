@@ -17,12 +17,14 @@ namespace Session1_Kazan
     public partial class EditPage : ContentPage
     {
         WebClient webClient = new WebClient();
-        List<Department> _departments = new List<Department>();
-        List<Location> _locations = new List<Location>();
-        List<AssetGroup> _assetGroups = new List<AssetGroup>();
-        List<Employee> _employees = new List<Employee>();
-        List<Asset> _assets = new List<Asset>();
+        List<Department> _departments;
+        List<Location> _locations;
+        List<AssetGroup> _assetGroups;
+        List<Employee> _employees;
+        List<Asset> _assets;
+        List<DepartmentLocation> _departLocations;
         CurrentAsset CurrentAsset = new CurrentAsset();
+
         string _assetSN = string.Empty;
         public EditPage()
         {
@@ -42,11 +44,10 @@ namespace Session1_Kazan
             {
                 loadAssetDetails();
             }
-            else
-            {
-                var getAssets = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Assets", "POST", Encoding.UTF8.GetBytes(""));
-                _assets = JsonConvert.DeserializeObject<List<Asset>>(Encoding.Default.GetString(getAssets));
-            }
+
+            var getAssets = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/Assets", "POST", Encoding.UTF8.GetBytes(""));
+            _assets = JsonConvert.DeserializeObject<List<Asset>>(Encoding.Default.GetString(getAssets));
+
 
         }
 
@@ -69,7 +70,6 @@ namespace Session1_Kazan
                 pDepartment.Items.Add(item.Name);
             }
             #endregion
-
 
             #region Getting all the asset groups and adding them into the picker
             var getAssetGroups = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/AssetGroups", "POST", Encoding.UTF8.GetBytes(""));
@@ -94,6 +94,9 @@ namespace Session1_Kazan
                 var response = await webClient.UploadDataTaskAsync($"http://10.0.2.2:49450/Assets/Details?assetSN={_assetSN}", "POST", Encoding.UTF8.GetBytes(""));
                 CurrentAsset = JsonConvert.DeserializeObject<CurrentAsset>(Encoding.Default.GetString(response));
             }
+
+            var getDepartmentLocations = await webClient.UploadDataTaskAsync($"http://10.0.2.2:49450/Departments/DepartmentLocations", "POST", Encoding.UTF8.GetBytes(""));
+            _departLocations = JsonConvert.DeserializeObject<List<DepartmentLocation>>(Encoding.Default.GetString(getDepartmentLocations));
         }
 
         private void loadAssetDetails()
@@ -116,9 +119,86 @@ namespace Session1_Kazan
 
         }
 
-        private void btnSubmit_Clicked(object sender, EventArgs e)
+        private async void btnSubmit_Clicked(object sender, EventArgs e)
         {
+            var getEmployeeID = (from x in _employees
+                                 where pAccountableParty.SelectedItem.ToString().Equals(x.FirstName + " " + x.LastName)
+                                 select x.ID).FirstOrDefault();
+            var getDepartmentID = (from x in _departments
+                                   where x.Name == pDepartment.SelectedItem.ToString()
+                                   select x.ID).FirstOrDefault();
 
+            var getLocationID = (from x in _locations
+                                 where x.Name == pLocation.SelectedItem.ToString()
+                                 select x.ID).FirstOrDefault();
+
+            var getDepartmentLocations = (from x in _departLocations
+                                          where x.DepartmentID == getDepartmentID && x.LocationID == getLocationID
+                                          select x.ID).FirstOrDefault();
+
+            var getAssetGroupID = (from x in _assetGroups
+                                   where x.Name == pAssetGroup.SelectedItem.ToString()
+                                   select x.ID).FirstOrDefault();
+
+            if (_assetSN == string.Empty)
+            {
+                var newAsset = new Asset()
+                {
+                    AssetName = entryAssetName.Text,
+                    AssetSN = lblAsset.Text,
+                    EmployeeID = getEmployeeID,
+                    Description = editorAssetDescription.Text.Trim(),
+                    DepartmentLocationID = 1,
+                    AssetGroupID = getAssetGroupID,
+                    WarrantyDate = dpExpiredWarranty.Date
+                };
+
+                var jsonData = JsonConvert.SerializeObject(newAsset);
+                using (var webClientSend = new WebClient())
+                {
+                    webClientSend.Headers.Add("Content-Type", "application/json");
+                    webClientSend.Encoding = Encoding.UTF8;
+                    var response = await webClientSend.UploadDataTaskAsync("http://10.0.2.2:49450/Assets/Create", "POST", Encoding.UTF8.GetBytes(jsonData));
+                    var getStringResponse = Encoding.Default.GetString(response);
+                    if (getStringResponse == "\"Asset created successful!\"")
+                    {
+                        await DisplayAlert("Add Asset", getStringResponse, "Ok");
+                        await Navigation.PopAsync();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Add Asset", "Unable to add Asset. Please check your details and try again", "Ok");
+                    }
+                }
+
+
+            }
+            else
+            {
+                var updateAsset = (from x in _assets
+                                   where x.AssetSN == lblAsset.Text
+                                   select x).FirstOrDefault();
+                updateAsset.Description = editorAssetDescription.Text.Trim();
+                updateAsset.WarrantyDate = dpExpiredWarranty.Date;
+                updateAsset.EmployeeID = getEmployeeID;
+                var jsonData = JsonConvert.SerializeObject(updateAsset);
+                using (var webClientEdit = new WebClient())
+                {
+                    webClientEdit.Headers.Add("Content-Type", "application/json");
+                    webClientEdit.Encoding = Encoding.UTF8;
+                    var response = await webClientEdit.UploadDataTaskAsync("http://10.0.2.2:49450/Assets/Edit", "POST", Encoding.UTF8.GetBytes(jsonData));
+                    var getStringResponse = Encoding.Default.GetString(response);
+                    if (getStringResponse == "\"Edit asset successful!\"")
+                    {
+                        await DisplayAlert("Add Asset", getStringResponse, "Ok");
+                        await Navigation.PopAsync();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Add Asset", "Unable to edit Asset. Please check your details and try again", "Ok");
+                    }
+                }
+            }
         }
 
         private async void btnCancel_Clicked(object sender, EventArgs e)
@@ -126,43 +206,46 @@ namespace Session1_Kazan
             await Navigation.PopAsync();
         }
 
-        
+
 
 
         private void pAssetGroup_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-            var getDepartmentID = (from x in _departments
-                                   where x.Name == pDepartment.SelectedItem.ToString()
-                                   select x.ID).FirstOrDefault();
-
-            var getAssetGroupID = (from x in _assetGroups
-                                   where x.Name == pAssetGroup.SelectedItem.ToString()
-                                   select x.ID).FirstOrDefault();
-
-            var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
-            var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
-
-            var lastAsset = (from x in _assets
-                             where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
-                             orderby x.AssetSN descending
-                             select x.AssetSN).FirstOrDefault();
-            if (lastAsset != null)
+            if (_assetSN == string.Empty)
             {
-                var newNumber = (Int64.Parse(lastAsset.Split('/')[2]) + 1).ToString().PadLeft(4, '0');
-                lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
+                var getDepartmentID = (from x in _departments
+                                       where x.Name == pDepartment.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
+
+                var getAssetGroupID = (from x in _assetGroups
+                                       where x.Name == pAssetGroup.SelectedItem.ToString()
+                                       select x.ID).FirstOrDefault();
+
+                var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
+                var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
+
+                var lastAsset = (from x in _assets
+                                 where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
+                                 orderby x.AssetSN descending
+                                 select x.AssetSN).FirstOrDefault();
+                if (lastAsset != null)
+                {
+                    var newNumber = (Int64.Parse(lastAsset.Split('/')[2]) + 1).ToString().PadLeft(4, '0');
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
+                }
+                else
+                {
+                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
+                }
             }
-            else
-            {
-                lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
-            }
+
 
 
         }
 
-        
 
-        
+
+
 
         private async void pDepartment_SelectedIndexChanged(object sender, EventArgs e)
         {
