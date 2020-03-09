@@ -61,5 +61,14 @@ namespace Session1_Kazan.Model
             public string LastName { get; set; }
             public string Phone { get; set; }
         }
+
+        public class DepartmentLocation
+        {
+            public long ID { get; set; }
+            public long DepartmentID { get; set; }
+            public long LocationID { get; set; }
+            public System.DateTime StartDate { get; set; }
+            public Nullable<System.DateTime> EndDate { get; set; }
+        }
     }
 }
