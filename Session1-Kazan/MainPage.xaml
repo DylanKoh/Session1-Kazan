@@ -39,6 +39,7 @@
                         <StackLayout Orientation="Horizontal"
                                          VerticalOptions="FillAndExpand"
                                          HorizontalOptions="FillAndExpand">
+                            <Image x:Name="imgAsset"/>
                             <StackLayout Orientation="Vertical"
                                      VerticalOptions="FillAndExpand"
                                          HorizontalOptions="FillAndExpand">

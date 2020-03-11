@@ -25,9 +25,24 @@
                 <Label Text="" x:Name="lblAsset" Grid.Column="2"/>
             </Grid>
             <Grid>
-                <Button Text="Submit" x:Name="btnSubmit" Clicked="btnSubmit_Clicked"/>
-                <Button Text="Cancel" x:Name="btnCancel" Clicked="btnCancel_Clicked" Grid.Column="1"/>
+                <Button Text="Capture" x:Name="btnCapture" Clicked="btnCapture_Clicked"/>
+                <Button Text="Browse" x:Name="btnBrowse" Clicked="btnBrowse_Clicked" Grid.Column="1" />
+                <ListView x:Name="lvImages">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout Orientation="Horizontal">
+                                    <Image x:Name="imgPhoto"></Image>
+                                    <Label Text="Image"></Label>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button Text="Submit" x:Name="btnSubmit" Clicked="btnSubmit_Clicked" Grid.Row="1"/>
+                <Button Text="Cancel" x:Name="btnCancel" Clicked="btnCancel_Clicked" Grid.Column="1" Grid.Row="1"/>
             </Grid>
+            
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

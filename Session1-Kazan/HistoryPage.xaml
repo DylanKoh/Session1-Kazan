@@ -6,10 +6,22 @@
              mc:Ignorable="d"
              x:Class="Session1_Kazan.HistoryPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+        <StackLayout Padding="10">
+            <Label Text="Transfer History" />
+            <ListView x:Name="lvTransfer">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout>
+                                <Label Text="{Binding TransferDate}"/>
+                                <Label Text="{Binding FromAssetSN}"/>
+                                <Label Text="{Binding ToAssetSN}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button Text="Back" x:Name="btnBack" Clicked="btnBack_Clicked"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

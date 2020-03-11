@@ -86,7 +86,7 @@ namespace Session1_Kazan
         {
             ImageButton button = (ImageButton)sender;
             var listViewItem = (StackLayout)button.Parent;
-            var label = (StackLayout)listViewItem.Children[0];
+            var label = (StackLayout)listViewItem.Children[1];
             var item = (Label)label.Children[2];
             await Navigation.PushAsync(new EditPage(item.Text));
         }
@@ -95,7 +95,7 @@ namespace Session1_Kazan
         {
             ImageButton button = (ImageButton)sender;
             var listViewItem = (StackLayout)button.Parent;
-            var label = (StackLayout)listViewItem.Children[0];
+            var label = (StackLayout)listViewItem.Children[1];
             var item = (Label)label.Children[2];
             await Navigation.PushAsync(new MovePage(item.Text));
         }
@@ -104,7 +104,7 @@ namespace Session1_Kazan
         {
             ImageButton button = (ImageButton)sender;
             var listViewItem = (StackLayout)button.Parent;
-            var label = (StackLayout)listViewItem.Children[0];
+            var label = (StackLayout)listViewItem.Children[1];
             var item = (Label)label.Children[2];
             await Navigation.PushAsync(new HistoryPage(item.Text));
         }
