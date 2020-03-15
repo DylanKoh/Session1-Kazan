@@ -272,8 +272,6 @@ namespace Session1_Kazan
 
         private async void btnCapture_Clicked(object sender, EventArgs e)
         {
-            var photo = await Plugin.Media.CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions() { });
-
         }
 
         private void btnBrowse_Clicked(object sender, EventArgs e)
