@@ -145,9 +145,68 @@ namespace Session1_Kazan
             }
         }
 
-        private void btnSubmit_Clicked(object sender, EventArgs e)
+        private async void btnSubmit_Clicked(object sender, EventArgs e)
         {
+            using (var webClient = new WebClient())
+            {
+                var getNewDepartmentID = (from x in _departments
+                                          where x.Name == pDestinationDepartment.SelectedItem.ToString()
+                                          select x.ID).FirstOrDefault();
+                var getLocationID = (from x in _locations
+                                     where x.Name == pDestinationLocation.SelectedItem.ToString()
+                                     select x.ID).FirstOrDefault();
+                var getAssetID = (from x in _assets
+                                  where x.AssetSN == entryAssetSN.Text
+                                  select x.ID).FirstOrDefault();
+                var getNewDepartmentLocationID = (from x in _departmentLocations
+                                               where x.DepartmentID == getNewDepartmentID && x.LocationID == getLocationID
+                                               select x.ID).FirstOrDefault();
+                var getCurrentDepartmentLocationID = (from x in _assets
+                                                      where x.ID == getAssetID
+                                                      select x.DepartmentLocationID).FirstOrDefault();
+                var newLogs = new AssetTranferLog()
+                {
+                    AssetID = getAssetID,
+                    FromAssetSN = entryAssetSN.Text,
+                    TransferDate = DateTime.Now,
+                    ToDepartmentLocationID = getNewDepartmentLocationID,
+                    ToAssetSN = entryNewAssetSN.Text,
+                    FromDepartmentLocationID = getCurrentDepartmentLocationID
+                };
+                var jsonData = JsonConvert.SerializeObject(newLogs);
+                webClient.Headers.Add("Content-Type", "application/json");
+                var response = await webClient.UploadDataTaskAsync("http://10.0.2.2:49450/AssetTransferLogs/Create", "POST", Encoding.UTF8.GetBytes(jsonData));
+                if (Encoding.Default.GetString(response) == "\"Successfully transfer Asset!\"")
+                {
+                    var getAsset = (from x in _assets
+                                    where x.ID == getAssetID
+                                    select x).FirstOrDefault();
+                    getAsset.DepartmentLocationID = getNewDepartmentLocationID;
+                    getAsset.AssetSN = entryNewAssetSN.Text;
+                    var jsonData2 = JsonConvert.SerializeObject(getAsset);
+                    using (var newWebClient = new WebClient())
+                    {
+                        newWebClient.Headers.Add("Content-Type", "application/json");
+                        var nextResponse = await newWebClient.UploadDataTaskAsync("http://10.0.2.2:49450/Assets/Edit", "POST", Encoding.UTF8.GetBytes(jsonData2));
+                        if (Encoding.Default.GetString(nextResponse) == "\"Edit asset successful!\"")
+                        {
+                            await DisplayAlert("Transfer Asset", "Asset transfer completed!!", "Ok");
+                            await Navigation.PopAsync();
+                        }
+                        else
+                        {
+                            await DisplayAlert("Transfer Asset", "Unable to complete second half of transaction of asset transfer!", "Ok");
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    await DisplayAlert("Transfer Asset", "Unable to complete transaction of asset transfer!", "Ok");
+                }
+                
 
+            }
         }
 
         private async void btnCancel_Clicked(object sender, EventArgs e)
