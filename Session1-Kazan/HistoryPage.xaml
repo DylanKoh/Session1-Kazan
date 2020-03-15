@@ -7,16 +7,20 @@
              x:Class="Session1_Kazan.HistoryPage">
     <ContentPage.Content>
         <StackLayout Padding="10">
-            <Label Text="Transfer History" />
-            <ListView x:Name="lvTransfer">
+            <Label Text="Transfer History" FontSize="Title"/>
+            <Label Text="No Transfer History Found!" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" x:Name="lblNull" IsVisible="False"/>
+            <ListView x:Name="lvTransfer" HasUnevenRows="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout>
-                                <Label Text="{Binding TransferDate}"/>
-                                <Label Text="{Binding FromAssetSN}"/>
-                                <Label Text="{Binding ToAssetSN}"/>
-                            </StackLayout>
+                            <Grid>
+                                <Label Text="Relocation Date: "/>
+                                <Label Text="{Binding TransferDate}" Grid.Column="1"/>
+                                <Label Text="{Binding FromLocation}" Grid.Row="1"/>
+                                <Label Text="{Binding FromAssetSN}" Grid.Column="1" Grid.Row="1"/>
+                                <Label Text="{Binding ToLocation}" Grid.Row="2"/>
+                                <Label Text="{Binding ToAssetSN}" Grid.Column="1" Grid.Row="2"/>
+                            </Grid>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

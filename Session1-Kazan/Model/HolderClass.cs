@@ -81,5 +81,13 @@ namespace Session1_Kazan.Model
             public long FromDepartmentLocationID { get; set; }
             public long ToDepartmentLocationID { get; set; }
         }
+        public class History
+        {
+            public DateTime TransferDate { get; set; }
+            public string FromLocation { get; set; }
+            public string FromAssetSN { get; set; }
+            public string ToLocation { get; set; }
+            public string ToAssetSN { get; set; }
+        }
     }
 }
