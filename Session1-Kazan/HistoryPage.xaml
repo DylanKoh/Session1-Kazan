@@ -6,10 +6,10 @@
              mc:Ignorable="d"
              x:Class="Session1_Kazan.HistoryPage">
     <ContentPage.Content>
-        <StackLayout Padding="10">
-            <Label Text="Transfer History" FontSize="Title"/>
+        <StackLayout Padding="10" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Label Text="Transfer History" FontSize="Title" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"/>
             <Label Text="No Transfer History Found!" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" x:Name="lblNull" IsVisible="False"/>
-            <ListView x:Name="lvTransfer" HasUnevenRows="True">
+            <ListView x:Name="lvTransfer" HasUnevenRows="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -25,7 +25,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button Text="Back" x:Name="btnBack" Clicked="btnBack_Clicked"/>
+            <Button Text="Back" x:Name="btnBack" Clicked="btnBack_Clicked" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
