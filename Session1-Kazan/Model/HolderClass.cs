@@ -70,5 +70,16 @@ namespace Session1_Kazan.Model
             public System.DateTime StartDate { get; set; }
             public Nullable<System.DateTime> EndDate { get; set; }
         }
+
+        public class AssetTranferLog
+        {
+            public long ID { get; set; }
+            public long AssetID { get; set; }
+            public System.DateTime TransferDate { get; set; }
+            public string FromAssetSN { get; set; }
+            public string ToAssetSN { get; set; }
+            public long FromDepartmentLocationID { get; set; }
+            public long ToDepartmentLocationID { get; set; }
+        }
     }
 }

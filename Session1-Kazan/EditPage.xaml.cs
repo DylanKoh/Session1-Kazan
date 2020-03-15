@@ -23,6 +23,7 @@ namespace Session1_Kazan
         List<Employee> _employees;
         List<Asset> _assets;
         List<DepartmentLocation> _departLocations;
+        List<AssetTranferLog> _assetTranferLogs;
         CurrentAsset CurrentAsset = new CurrentAsset();
 
         string _assetSN = string.Empty;
@@ -97,6 +98,9 @@ namespace Session1_Kazan
 
             var getDepartmentLocations = await webClient.UploadDataTaskAsync($"http://10.0.2.2:49450/Departments/DepartmentLocations", "POST", Encoding.UTF8.GetBytes(""));
             _departLocations = JsonConvert.DeserializeObject<List<DepartmentLocation>>(Encoding.Default.GetString(getDepartmentLocations));
+
+            var getTransferLogs = await webClient.UploadDataTaskAsync($"http://10.0.2.2:49450/AssetTransferLogs", "POST", Encoding.UTF8.GetBytes(""));
+            _assetTranferLogs = JsonConvert.DeserializeObject<List<AssetTranferLog>>(Encoding.Default.GetString(getTransferLogs));
         }
 
         private void loadAssetDetails()
@@ -209,35 +213,49 @@ namespace Session1_Kazan
 
 
 
-        private void pAssetGroup_SelectedIndexChanged(object sender, EventArgs e)
+        private async void pAssetGroup_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (_assetSN == string.Empty)
+            if (pDepartment.SelectedItem == null)
             {
-                var getDepartmentID = (from x in _departments
-                                       where x.Name == pDepartment.SelectedItem.ToString()
-                                       select x.ID).FirstOrDefault();
-
-                var getAssetGroupID = (from x in _assetGroups
-                                       where x.Name == pAssetGroup.SelectedItem.ToString()
-                                       select x.ID).FirstOrDefault();
-
-                var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
-                var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
-
-                var lastAsset = (from x in _assets
-                                 where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
-                                 orderby x.AssetSN descending
-                                 select x.AssetSN).FirstOrDefault();
-                if (lastAsset != null)
+                await DisplayAlert("Asset SN", "Please select your department and reselect asset group to auto generate an Asset SN!", "Ok");
+            }
+            else
+            {
+                if (_assetSN == string.Empty)
                 {
-                    var newNumber = (Int64.Parse(lastAsset.Split('/')[2]) + 1).ToString().PadLeft(4, '0');
-                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
-                }
-                else
-                {
-                    lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
+                    var getDepartmentID = (from x in _departments
+                                           where x.Name == pDepartment.SelectedItem.ToString()
+                                           select x.ID).FirstOrDefault();
+
+                    var getAssetGroupID = (from x in _assetGroups
+                                           where x.Name == pAssetGroup.SelectedItem.ToString()
+                                           select x.ID).FirstOrDefault();
+
+                    var newDepartmentID = getDepartmentID.ToString().PadLeft(2, '0');
+                    var newAssetGroupID = getAssetGroupID.ToString().PadLeft(2, '0');
+
+                    List<string> usedAssetSN = new List<string>();
+                    usedAssetSN.Add((from x in _assets
+                                     where x.AssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
+                                     orderby x.AssetSN descending
+                                     select x.AssetSN).FirstOrDefault());
+                    usedAssetSN.Add((from x in _assetTranferLogs
+                                     where x.FromAssetSN.Contains($"{newDepartmentID}/{newAssetGroupID}")
+                                     orderby x.FromAssetSN descending
+                                     select x.FromAssetSN).FirstOrDefault());
+                    usedAssetSN.OrderByDescending(x => x);
+                    if (usedAssetSN.First() != null)
+                    {
+                        var newNumber = (Int64.Parse(usedAssetSN.First().Split('/')[2]) + 1).ToString().PadLeft(4, '0');
+                        lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/{newNumber}";
+                    }
+                    else
+                    {
+                        lblAsset.Text = $"{newDepartmentID}/{newAssetGroupID}/0001";
+                    }
                 }
             }
+            
 
 
 

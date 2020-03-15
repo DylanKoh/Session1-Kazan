@@ -6,10 +6,27 @@
              mc:Ignorable="d"
              x:Class="Session1_Kazan.MovePage">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+        <StackLayout Padding="10">
+            <Label Text="Selected Asset" FontSize="Title" FontAttributes="Bold"/>
+            <Grid Padding="5">
+                <Label Text="Asset Name: "/>
+                <Label Text="Current Department: " Grid.Column="1"/>
+                <Entry IsEnabled="False" x:Name="entryAssetName" Grid.Row="1"/>
+                <Entry IsEnabled="False" x:Name="entryCurrentDepartment" Grid.Row="1" Grid.Column="1"/>
+                <Label Text="Asset SN: " Grid.Row="2"/>
+                <Entry IsEnabled="False" x:Name="entryAssetSN" Grid.Row="3"/>
+            </Grid>
+            <Label Text="Destination Department" FontSize="Title" FontAttributes="Bold"/>
+            <Grid Padding="5">
+                <Picker Title="Destination Department" x:Name="pDestinationDepartment" SelectedIndexChanged="pDestinationDepartment_SelectedIndexChanged"/>
+                <Picker Title="Destination Location" x:Name="pDestinationLocation" SelectedIndexChanged="pDestinationLocation_SelectedIndexChanged" Grid.Column="1"/>
+                <Label Text="New Asset SN: " Grid.Row="1"/>
+                <Entry IsEnabled="False" x:Name="entryNewAssetSN" Grid.Row="2"/>
+            </Grid>
+            <Grid>
+                <Button x:Name="btnSubmit" Text="Submit" Clicked="btnSubmit_Clicked"/>
+                <Button x:Name="btnCancel" Text="Cancel" Clicked="btnCancel_Clicked" Grid.Column="1"/>
+            </Grid>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
